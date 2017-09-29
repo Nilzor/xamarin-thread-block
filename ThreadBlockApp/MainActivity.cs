@@ -43,7 +43,7 @@ namespace ThreadBlockApp
                 Log.Info("BLOK", "Load started " + i);
                 list.Add(task);
             }
-            await Task.Run(() => Task.WhenAll<Bitmap>(list));
+            await Task.WhenAll<Bitmap>(list);
         }
  
         private static HttpClient Client = new HttpClient();
