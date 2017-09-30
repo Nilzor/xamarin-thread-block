@@ -34,7 +34,7 @@ namespace ThreadBlockApp
             {
                 Task task = LoadAndShowImage(ImageUrlList[i], i);
                 list.Add(task);
-                if (i % 2 == 0)
+                if (i % 1 == 0)
                 {
                     await Task.WhenAll(list);
                     list.Clear();
