@@ -21,7 +21,7 @@ namespace ThreadBlockApp
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main);
-            Task.Run(() => LoadImages());
+            LoadImages();
             Log.Debug("BLOK", "onCreate done");
         }
 
@@ -41,14 +41,9 @@ namespace ThreadBlockApp
         public async Task LoadAndShowImage(String uri, int i)
         {
             var bitmap = await Task.Run(() => LoadAndDecodeBitmap(uri, i));
-            Log.Info("BLOK", "Queueing SHOW BITMAP " + i);
-
-            RunOnUiThread(() =>
-            {
-                Log.Info("BLOK", "Executing SHOW BITMAP " + i);
-                TryShowBitmap(bitmap, i);
-                if (i == 0) ShowTime();
-            });
+            Log.Info("BLOK", "Executing SHOW BITMAP " + i);
+            TryShowBitmap(bitmap, i);
+            if (i == 0) ShowTime();
         }
 
         private static HttpClient Client = new HttpClient();
