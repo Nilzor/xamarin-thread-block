@@ -4,10 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/imageListContainer">
-    <TextView 
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        android:id="@+id/timestamp"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/timestampFirst" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/timestampLast" />
     <ImageView
         android:src="@android:drawable/ic_menu_gallery"
         android:layout_width="match_parent"

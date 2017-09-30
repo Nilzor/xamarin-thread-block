@@ -34,8 +34,14 @@ namespace ThreadBlockApp
             {
                 Task task = LoadAndShowImage(ImageUrlList[i], i);
                 list.Add(task);
+                if (i % 2 == 0)
+                {
+                    await Task.WhenAll(list);
+                    list.Clear();
+                }
             }
             await Task.WhenAll(list);
+            ShowTime(Resource.Id.timestampLast);
         }
 
         public async Task LoadAndShowImage(String uri, int i)
@@ -43,7 +49,7 @@ namespace ThreadBlockApp
             var bitmap = await Task.Run(() => LoadAndDecodeBitmap(uri, i));
             Log.Info("BLOK", "Executing SHOW BITMAP " + i);
             TryShowBitmap(bitmap, i);
-            if (i == 0) ShowTime();
+            if (i == 0) ShowTime(Resource.Id.timestampFirst);
         }
 
         private static HttpClient Client = new HttpClient();
@@ -73,9 +79,9 @@ namespace ThreadBlockApp
             return null;
         }
 
-        private void ShowTime()
+        private void ShowTime(int viewId)
         {
-            FindViewById<TextView>(Resource.Id.timestamp).SetText((System.Environment.TickCount - startTime) + "ms", TextView.BufferType.Normal);
+            FindViewById<TextView>(viewId).SetText((System.Environment.TickCount - startTime) + "ms", TextView.BufferType.Normal);
         }
 
         /// <summary>
@@ -86,7 +92,7 @@ namespace ThreadBlockApp
 
             if (img == null) return;
             LinearLayout container = FindViewById<LinearLayout>(Resource.Id.imageListContainer);
-            View view = container.GetChildAt(n + 1); // Skip the textview
+            View view = container.GetChildAt(n + 2); // Skip the textviews
             if (view is ImageView)
             {
                 ((ImageView)view).SetImageBitmap(img);
