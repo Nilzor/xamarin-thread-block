@@ -14,7 +14,7 @@ namespace ThreadBlockApp
     [Activity(Label = "ThreadBlockApp", MainLauncher = true, Icon = "@mipmap/icon")]
     public class MainActivity : Activity
     {
-        int ImagesToLoad = 10; // Set this to 1 to observe the difference in time for the first picture loaded
+        int ImagesToLoad = 5; // Set this to 1 to observe the difference in time for the first picture loaded
         long startTime;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -23,12 +23,13 @@ namespace ThreadBlockApp
             SetContentView(Resource.Layout.Main);
             //Task.Factory.StartNew(() => LoadImages());
 
-            LoadImages();
+            Task.Run(() => LoadImages());
             Log.Debug("BLOK", "onCreate done");
         }
 
         private async void LoadImages()
         {
+            Log.Info("BLOK", "Load images initiating");
             startTime = System.Environment.TickCount;
             string[] urls = {
                 "https://i.imgur.com/4AiXzf8.jpg",
@@ -54,9 +55,12 @@ namespace ThreadBlockApp
         public async Task LoadAndShowImage(String uri, int i)
         {
             var bitmap = await Task.Run(() => LoadAndDecodeBitmap(uri, i));
-            Log.Info("BLOK", "Try show bitmap " + i);
-            TryShowBitmap(bitmap, i);
-            if (i == 0) ShowTime();
+            Log.Info("BLOK", "Queueing SHOW BITMAP " + i);
+            RunOnUiThread(() => {
+                Log.Info("BLOK", "Executing SHOW BITMAP " + i);
+                TryShowBitmap(bitmap, i);
+                if (i == 0) ShowTime();
+            });
         }
  
         private static HttpClient Client = new HttpClient();
