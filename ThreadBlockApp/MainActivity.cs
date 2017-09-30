@@ -14,14 +14,17 @@ namespace ThreadBlockApp
     [Activity(Label = "ThreadBlockApp", MainLauncher = true, Icon = "@mipmap/icon")]
     public class MainActivity : Activity
     {
-        int ImagesToLoad = 5; // Set this to 1 to observe the difference in time for the first picture loaded
+        int ImagesToLoad = 10; // Set this to 1 to observe the difference in time for the first picture loaded
         long startTime;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main);
+            //Task.Factory.StartNew(() => LoadImages());
+
             LoadImages();
+            Log.Debug("BLOK", "onCreate done");
         }
 
         private async void LoadImages()
@@ -32,36 +35,45 @@ namespace ThreadBlockApp
                 "https://i.imgur.com/wYTCtRu.jpg",
                 "https://i.imgur.com/2oTdDKF.jpg",
                 "https://i.imgur.com/4AiXzf8.jpg",
+                "https://i.imgur.com/4AiXzf8.jpg",
+                "https://i.imgur.com/wYTCtRu.jpg",
+                "https://i.imgur.com/2oTdDKF.jpg",
+                "https://i.imgur.com/4AiXzf8.jpg",
+                "https://i.imgur.com/4AiXzf8.jpg",
                 "https://i.imgur.com/wYTCtRu.jpg"
             };
-            var list = new List<Task<Bitmap>>();
+            var list = new List<Task>();
             for (int i = 0; i < ImagesToLoad; i++)
             {
-                Log.Info("BLOK", "Starting load of " + i);
-                Task<Bitmap> task = loadAndDecodeBitmap(urls[i], i);
-
-                Log.Info("BLOK", "Load started " + i);
+                Task task = LoadAndShowImage(urls[i], i);
                 list.Add(task);
             }
-            await Task.WhenAll<Bitmap>(list);
+            await Task.WhenAll(list);
+        }
+
+        public async Task LoadAndShowImage(String uri, int i)
+        {
+            var bitmap = await Task.Run(() => LoadAndDecodeBitmap(uri, i));
+            Log.Info("BLOK", "Try show bitmap " + i);
+            TryShowBitmap(bitmap, i);
+            if (i == 0) ShowTime();
         }
  
         private static HttpClient Client = new HttpClient();
-        public async Task<Bitmap> loadAndDecodeBitmap(String uri, int i)
+        public async Task<Bitmap> LoadAndDecodeBitmap(String uri, int i)
         {
             try
             {
+                Log.Info("BLOK", "Starting load of " + i);
                 byte[] data = await Client.GetByteArrayAsync(uri);
 
                 Log.Info("BLOK", "Load completed " + i);
                 Bitmap img = BitmapFactory.DecodeByteArray(data, 0, data.Length);
-                TryShowBitmap(img, i);
-                if (i == 0) ShowTime();
                 return img;
             }
             catch (Exception ex)
             {
-                Log.Error("BLOK", String.Format("Failed loading image %s: %s", uri, ex.Message));
+                Log.Error("BLOK", String.Format("Failed loading image {0}: {1}", uri, ex.Message));
                 throw ex;
             }
         }
